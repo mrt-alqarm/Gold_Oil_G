@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تحليل آليات التضخيم البصري في التمثيل الرسومي للبيانات الاقتصادية</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 40px; 
+            background-color: #f9f9f9; 
+            color: #333; 
+            text-align: center;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            height: 600px;
+            margin: 40px 0;
+        }
+        
+        .axis-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .data-point {
+            position: absolute;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 12px;
+            border-left: 3px solid;
+            display: none;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 4px;
+        }
+        
+        .analysis-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+        
+        [dir="rtl"] .analysis-panel {
+            border-right: 4px solid #3498db;
+            border-left: none;
+            text-align: right;
+        }
+        
+        [dir="ltr"] .analysis-panel {
+            border-left: 4px solid #3498db;
+            border-right: none;
+            text-align: left;
+        }
+        
+        .analysis-panel h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .key-finding {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+        
+        [dir="rtl"] .key-finding {
+            border-right: 3px solid #e74c3c;
+            border-left: none;
+        }
+        
+        [dir="ltr"] .key-finding {
+            border-left: 3px solid #e74c3c;
+            border-right: none;
+        }
+        
+        .methodology {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .comparison-box {
+            padding: 20px;
+            border-radius: 8px;
+            background: white;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .comparison-box h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .lang-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: #2980b9;
+            font-weight: bold;
+        }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 data-key="title">آلية كشف الوهم عبر التحليل العلمي</h1>
+    <div class="subtitle"><div class="subtitle" data-key="subtitle">دراسة مقارنة بين القيمة الحقيقية والقيمة الوهمية (1970-2025)</div>
+    
+    <div class="language-selector">
+        <button id="lang-ar" class="lang-btn active">العربية</button>
+        <button id="lang-fa" class="lang-btn">فارسی</button>
+        <button id="lang-en" class="lang-btn">English</button>
+        <button id="lang-fr" class="lang-btn">Français</button>
+        <button id="lang-zh" class="lang-btn">中文</button>
+    </div>
+    
+    <div class="chart-wrapper">
+        <canvas id="scientificChart"></canvas>
+    </div>
+    
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color" style="background: #3498db;"></div>
+            <span data-key="legend_real">القيمة الحقيقية (غرام ذهب/برميل) - مقياس ثابت</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #9b59b6;"></div>
+            <span data-key="legend_amplified">القيمة الوهمية (دولار/100) - مقياس معدل</span>
+        </div>
+    </div>
+    
+    <div class="methodology" data-key="methodology_text">
+        <strong>منهجية التحليل:</strong> 
+        يمثل الخط الأزرق القيمة الحقيقية للنفط مقاسة بالذهب (غرام/برميل). 
+        يمثل الخط البنفسجي القيمة الوهمية حيث تم ضغط المقياس بحيث تمثل كل وحدة 100 دولار، 
+        مع دقة قياس 0.2 للوحدات لتوضيح آلية التضخيم البصري.
+    </div>
+    
+    <div class="comparison">
+        <div class="comparison-box">
+            <h4 data-key="comparison_real_title">المتغير الحقيقي</h4>
+            <p data-key="comparison_real_desc">الذهب كمقياس ثابت القيمة عبر الزمن</p>
+            <p data-key="comparison_real_change" style="color: #3498db; font-weight: bold;">التغير: -56.4% (1970-2025)</p>
+        </div>
+        
+        <div class="comparison-box">
+            <h4 data-key="comparison_nominal_title">المتغير الاسمي</h4>
+            <p data-key="comparison_nominal_desc">الدولار كمقياس متغير القيمة</p>
+            <p data-key="comparison_nominal_change" style="color: #9b59b6; font-weight: bold;">التغير: +4622% (1970-2025)</p>
+        </div>
+        
+        <div class="comparison-box">
+            <h4 data-key="comparison_mechanism_title">آلية التضخيم البصري</h4>
+            <p data-key="comparison_mechanism_desc1">ضغط المقياس: 100 دولار = 1 وحدة</p>
+            <p data-key="comparison_mechanism_desc2">دقة التمثيل: 0.2 وحدة</p>
+        </div>
+    </div>
+    
+    <div class="analysis-panel">
+        <h3 data-key="analysis_title">النتائج التحليلية</h3>
+        
+        <div class="key-finding" data-key="result1">
+            <strong>نتيجة 1:</strong> عند استخدام مقياس قيمي ثابت (الذهب)، يظهر انخفاض القيمة الحقيقية للنفط بنسبة 56.4% بين عامي 1970 و2025.
+        </div>
+        
+        <div class="key-finding" data-key="result2">
+            <strong>نتيجة 2:</strong> عند استخدام مقياس نقدي متغير (الدولار)، يظهر ارتفاع سعر النفط بنسبة 4622% خلال نفس الفترة.
+        </div>
+        
+        <div class="key-finding" data-key="result3">
+            <strong>نتيجة 3:</strong> آلية ضغط المقياس (100 دولار = 1 وحدة) تخفي حقيقة تآكل القيمة الشرائية للدولار بنسبة 99% مقابل الذهب منذ 1971.
+        </div>
+        
+        <div class="key-finding" data-key="result4">
+            <strong>نتيجة 4:</strong> الفترة 1998-2008 تشهد أكبر انفصال بين القيمة الحقيقية والقيمة الوهمية، مما يشير إلى مرحلة حرجة في آلية التضخيم البصري.
+        </div>
+    </div>
+</div>
+
+<script>
+// البيانات العلمية
+const years = [1970, 1974, 1980, 1986, 1998, 2000, 2008, 2011, 2015, 2016, 2020, 2022, 2024, 2025];
+const oilPriceUSD = [1.8, 12.8, 37.42, 14.44, 12.72, 27.39, 97.26, 111.26, 52.32, 43.64, 41.96, 100.93, 80.34, 85];
+const oilPriceGoldGrams = [1.44, 2.164, 1.956, 1.223, 1.371, 3.126, 3.477, 2.261, 1.536, 1.182, 0.697, 1.745, 0.952, 0.628];
+
+// تطبيق آلية التضخيم البصري: ضغط المقياس
+const compressedUSDScale = oilPriceUSD.map(price => price / 100);
+
+let currentLang = 'ar';
+let translations = {};
+
+const ctx = document.getElementById('scientificChart').getContext('2d');
+
+// دالة للحصول على الترجمة الحالية
+function getLang() {
+    return translations[currentLang] || translations['ar'] || {};
+}
+
+window.myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: years,
+        datasets: [
+            {
+                label: 'القيمة الحقيقية (غرام ذهب/برميل)',
+                data: oilPriceGoldGrams,
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52, 152, 219, 0.05)',
+                yAxisID: 'yReal',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 3,
+                pointRadius: 6,
+                pointBackgroundColor: '#3498db',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            },
+            {
+                label: 'القيمة الوهمية (دولار/100)',
+                data: compressedUSDScale,
+                borderColor: '#9b59b6',
+                backgroundColor: 'rgba(155, 89, 182, 0.05)',
+                yAxisID: 'yCompressed',
+                tension: 0.3,
+                fill: true,
+                borderWidth: 3,
+                borderDash: [4, 4],
+                pointRadius: 6,
+                pointBackgroundColor: '#9b59b6',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        plugins: {
+            legend: {
+                position: 'top',
+                labels: {
+                    font: {
+                        size: 14,
+                        family: 'Arial'
+                    },
+                    padding: 20,
+                    usePointStyle: true
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                titleColor: '#2c3e50',
+                bodyColor: '#34495e',
+                borderColor: '#ddd',
+                borderWidth: 1,
+                padding: 12,
+                cornerRadius: 6,
+                displayColors: false,
+                callbacks: {
+                    label: function(context) {
+                        const value = context.parsed.y;
+                        const lang = getLang();
+                        
+                        if (context.datasetIndex === 0) {
+                            return (lang.tooltip_real || 'القيمة الحقيقية: ') + value.toFixed(3) + (lang.tooltip_real_unit || ' غرام ذهب/برميل');
+                        } else {
+                            const actualUSD = (value * 100).toFixed(2);
+                            return (lang.tooltip_amplified || 'القيمة الوهمية: ') + value.toFixed(2) + (lang.tooltip_amplified_unit || ' وحدة (') + actualUSD + (lang.tooltip_actual || ' دولار فعلياً)');
+                        }
+                    },
+                    title: function(context) {
+                        const lang = getLang();
+                        return (lang.tooltip_year || 'السنة: ') + context[0].label;
+                    },
+                    afterLabel: function(context) {
+                        const lang = getLang();
+                        if (context.datasetIndex === 0 && context.dataIndex === years.indexOf(2008)) {
+                            return lang.tooltip_peak_real || 'الذروة الحقيقية: 3.477 غرام ذهب/برميل';
+                        }
+                        if (context.datasetIndex === 1 && context.dataIndex === years.indexOf(2022)) {
+                            return lang.tooltip_peak_nominal || 'الذروة الاسمية: 100.93 دولار/برميل';
+                        }
+                        return '';
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
+                ticks: {
+                    color: '#555',
+                    font: {
+                        size: 12,
+                        family: 'Arial'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'الفترة الزمنية (بالسنوات)',
+                    color: '#2c3e50',
+                    font: {
+                        size: 14,
+                        weight: '500'
+                    }
+                }
+            },
+            yReal: {
+                type: 'linear',
+                display: true,
+                position: 'left',
+                min: 0,
+                max: 4,
+                ticks: {
+                    color: '#3498db',
+                    font: {
+                        size: 12,
+                        family: 'Arial'
+                    },
+                    stepSize: 0.5,
+                    callback: function(value) {
+                        const lang = getLang();
+                        return value.toFixed(1) + (lang.y_real_unit || ' غرام');
+                    }
+                },
+                grid: {
+                    color: 'rgba(52, 152, 219, 0.1)'
+                },
+                title: {
+                    display: true,
+                    text: 'القيمة الحقيقية (غرام ذهب/برميل)',
+                    color: '#3498db',
+                    font: {
+                        size: 13,
+                        weight: '500'
+                    }
+                }
+            },
+            yCompressed: {
+                type: 'linear',
+                display: true,
+                position: 'right',
+                min: 0,
+                max: 1.2,
+                ticks: {
+                    color: '#9b59b6',
+                    font: {
+                        size: 12,
+                        family: 'Arial'
+                    },
+                    stepSize: 0.2,
+                    callback: function(value) {
+                        const lang = getLang();
+                        return value.toFixed(1) + ' ' + (lang.y_compressed_unit || 'وحدة');
+                    }
+                },
+                grid: {
+                    color: 'rgba(155, 89, 182, 0.1)',
+                    drawOnChartArea: false
+                },
+                title: {
+                    display: true,
+                    text: 'مقياس مضغوط (كل وحدة = 100 دولار)',
+                    color: '#9b59b6',
+                    font: {
+                        size: 13,
+                        weight: '500'
+                    }
+                }
+            }
+        }
+    }
+});
+
+// إضافة تحليل تلقائي للبيانات
+document.addEventListener('DOMContentLoaded', function() {
+    // حساب النسب المئوية للتغير
+    const realChange = ((oilPriceGoldGrams[oilPriceGoldGrams.length-1] - oilPriceGoldGrams[0]) / oilPriceGoldGrams[0] * 100).toFixed(1);
+    const nominalChange = ((oilPriceUSD[oilPriceUSD.length-1] - oilPriceUSD[0]) / oilPriceUSD[0] * 100).toFixed(0);
+    
+    // تحديث النتائج في التحليل
+    document.querySelectorAll('.key-finding')[0].innerHTML = 
+        `<strong>نتيجة 1:</strong> عند استخدام مقياس قيمي ثابت (الذهب)، يظهر انخفاض القيمة الحقيقية للنفط بنسبة ${Math.abs(realChange)}% بين عامي 1970 و2025.`;
+    
+    document.querySelectorAll('.key-finding')[1].innerHTML = 
+        `<strong>نتيجة 2:</strong> عند استخدام مقياس نقدي متغير (الدولار)، يظهر ارتفاع سعر النفط بنسبة ${nominalChange}% خلال نفس الفترة.`;
+});
+
+// تحميل الترجمات
+fetch('languages.json')
+    .then(response => response.json())
+    .then(data => {
+        translations = data;
+        updateLanguage(currentLang);
+    })
+    .catch(error => console.error('Error loading translations:', error));
+
+// تحديث اللغة
+function updateLanguage(lang) {
+    currentLang = lang;
+    document.querySelectorAll('[data-key]').forEach(element => {
+        const key = element.getAttribute('data-key');
+        if (translations[lang] && translations[lang][key]) {
+            element.innerHTML = translations[lang][key];
+        }
+    });
+
+    // تحديث الرسم البياني
+    if (window.myChart) {
+        const t = translations[lang] || {};
+        
+        // تحديث تسميات البيانات
+        window.myChart.data.datasets[0].label = t.chart_real_label || 'القيمة الحقيقية (غرام ذهب/برميل)';
+        window.myChart.data.datasets[1].label = t.chart_amplified_label || 'القيمة الوهمية (دولار/100)';
+        
+        // تحديث عناوين المحاور
+        window.myChart.options.scales.x.title.text = t.x_title || 'الفترة الزمنية (بالسنوات)';
+        window.myChart.options.scales.yReal.title.text = t.y_real_title || 'القيمة الحقيقية (غرام ذهب/برميل)';
+        window.myChart.options.scales.yCompressed.title.text = t.y_compressed_title || 'مقياس مضغوط (كل وحدة = 100 دولار)';
+        
+        window.myChart.update();
+    }
+
+    // تحديث اتجاه النص
+    if (lang === 'fa') {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', 'fa');
+    } else if (lang === 'ar') {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.setAttribute('lang', 'ar');
+    } else {
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.documentElement.setAttribute('lang', lang);
+    }
+
+    // تحديث الأزرار
+    document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`lang-${lang}`).classList.add('active');
+}
+
+// معالجات الأزرار
+document.getElementById('lang-ar').addEventListener('click', () => updateLanguage('ar'));
+document.getElementById('lang-en').addEventListener('click', () => updateLanguage('en'));
+document.getElementById('lang-fa').addEventListener('click', () => updateLanguage('fa'));
+document.getElementById('lang-fr').addEventListener('click', () => updateLanguage('fr'));
+document.getElementById('lang-zh').addEventListener('click', () => updateLanguage('zh'));
+</script>
+
+<div class="footer">
+    <p data-key="footer">تم التطوير بالتعاون وتوجيه مدروس مع نماذج AI</p>
+</div>
+</body>
+</html>
