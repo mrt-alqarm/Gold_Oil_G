@@ -460,18 +460,25 @@ window.myChart = new Chart(ctx, {
     }
 });
 
-// إضافة تحليل تلقائي للبيانات
-document.addEventListener('DOMContentLoaded', function() {
+// تحديث النتائج التحليلية ديناميكياً
+function updateAnalysisResults() {
     // حساب النسب المئوية للتغير
     const realChange = ((oilPriceGoldGrams[oilPriceGoldGrams.length-1] - oilPriceGoldGrams[0]) / oilPriceGoldGrams[0] * 100).toFixed(1);
     const nominalChange = ((oilPriceUSD[oilPriceUSD.length-1] - oilPriceUSD[0]) / oilPriceUSD[0] * 100).toFixed(0);
     
-    // تحديث النتائج في التحليل
-    document.querySelectorAll('.key-finding')[0].innerHTML = 
-        `<strong>نتيجة 1:</strong> عند استخدام مقياس قيمي ثابت (الذهب)، يظهر انخفاض القيمة الحقيقية للنفط بنسبة ${Math.abs(realChange)}% بين عامي 1970 و2025.`;
+    const lang = getLang();
     
-    document.querySelectorAll('.key-finding')[1].innerHTML = 
-        `<strong>نتيجة 2:</strong> عند استخدام مقياس نقدي متغير (الدولار)، يظهر ارتفاع سعر النفط بنسبة ${nominalChange}% خلال نفس الفترة.`;
+    // تحديث النتائج في التحليل
+    document.querySelectorAll('.key-finding')[0].innerHTML =
+        `<strong>${lang.result1_title || 'نتيجة 1:'}</strong> ${(lang.result1_prefix || 'عند استخدام مقياس قيمي ثابت (الذهب)، يظهر انخفاض القيمة الحقيقية للنفط بنسبة')} ${Math.abs(realChange)}% ${(lang.result1_suffix || 'بين عامي 1970 و2025.')}`;
+    
+    document.querySelectorAll('.key-finding')[1].innerHTML =
+        `<strong>${lang.result2_title || 'نتيجة 2:'}</strong> ${(lang.result2_prefix || 'عند استخدام مقياس نقدي متغير (الدولار)، يظهر ارتفاع سعر النفط بنسبة')} ${nominalChange}% ${(lang.result2_suffix || 'خلال نفس الفترة.')}`;
+}
+
+// إضافة تحليل تلقائي للبيانات
+document.addEventListener('DOMContentLoaded', function() {
+    updateAnalysisResults();
 });
 
 // تحميل الترجمات
@@ -524,6 +531,9 @@ function updateLanguage(lang) {
     // تحديث الأزرار
     document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`lang-${lang}`).classList.add('active');
+    
+    // تحديث النتائج التحليلية
+    updateAnalysisResults();
 }
 
 // معالجات الأزرار
@@ -536,6 +546,8 @@ document.getElementById('lang-zh').addEventListener('click', () => updateLanguag
 
 <div class="footer">
     <p data-key="footer">تم التطوير بالتعاون وتوجيه مدروس مع نماذج AI</p>
+    <p data-key="version">الإصدار 2.0 - 2025/12/27</p>
 </div>
+
 </body>
 </html>
